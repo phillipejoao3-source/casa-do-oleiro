@@ -231,6 +231,8 @@ section { position: relative; }
 .panel-translucent { background: var(--panel-translucent); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
 .panel-solid { background: var(--panel-translucent); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
 .panel-solid + .panel-solid, .panel-solid + .footer { border-top: 1px solid var(--line); }
+/* Newsletter + footer — fully transparent like hero, animation shows through */
+.newsletter, .footer { backdrop-filter: none; -webkit-backdrop-filter: none; background: transparent; }
 
 /* ═══════════════════════════════════════════════════
    HERO — transparent so potter bg shows
@@ -248,6 +250,7 @@ section { position: relative; }
 .hero-addr-sm { display: none; }
 .hero-visit-cta { display: none; }
 .theme-toggle--hero { display: none; }
+.hamburger { display: none; }
 .scroll-hint .line { width: 40px; height: 1px; background: currentColor; animation: scrollLine 2s var(--ease-in-out) infinite; }
 @keyframes scrollLine { 0%,100% { transform: scaleX(.3); transform-origin: left; } 50% { transform: scaleX(1); transform-origin: left; } }
 
@@ -420,7 +423,7 @@ body.motion-off .gallery-strip { animation-play-state: paused; }
 .footer { padding: 70px 32px 30px; }
 .footer-inner { max-width: 1280px; margin: 0 auto; }
 .footer-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--line); }
-.footer-brand img { height: 54px; margin-bottom: 18px; }
+.footer-brand img { height: 88px; margin-bottom: 18px; }
 .theme-dark .footer .logo-dark, .theme-light .footer .logo-light { display: none; }
 .footer-brand p { font-size: 14px; line-height: 1.6; color: var(--fg-dim); max-width: 320px; }
 .footer-col h4 { font-size: 10px; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--orange-500); margin-bottom: 18px; }
@@ -493,6 +496,37 @@ body.motion-off .gallery-strip { animation-play-state: paused; }
   .nav .theme-toggle { display: none; }
   /* CTA hidden from nav on mobile — lives in hero instead */
   .nav .nav-cta { display: none; }
+
+  /* Hamburger button — top-left in nav */
+  .hamburger {
+    display: flex; flex-direction: column; justify-content: center; gap: 4px;
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    padding: 8px; z-index: 10;
+    width: 32px; height: 32px;
+  }
+  .hamburger span {
+    display: block; width: 18px; height: 1.5px;
+    background: var(--fg);
+    transition: transform 0.25s var(--ease-out), opacity 0.2s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger.open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+
+  /* Nav drawer — shown when nav has nav-open class */
+  .nav.nav-open .nav-links {
+    display: flex; flex-direction: column; gap: 0;
+    flex: 0 0 100%; order: 2;
+    padding: 10px 0 14px;
+    border-top: 1px solid var(--line);
+  }
+  .nav.nav-open .nav-links a {
+    padding: 11px 4px;
+    font-size: 12px; letter-spacing: .14em;
+    border-bottom: 1px solid var(--line);
+    opacity: .8;
+  }
+  .nav.nav-open .nav-links a:last-child { border-bottom: none; }
 
   /* Hero toggle — visible on mobile, sits above the eyebrow */
   .theme-toggle--hero { display: block; position: relative; width: 38px; height: 22px; margin-bottom: 14px; }
@@ -618,7 +652,7 @@ body.motion-off .gallery-strip { animation-play-state: paused; }
   .footer { padding: 56px 20px 24px; }
   .footer-top { grid-template-columns: 1fr 1fr; gap: 28px; padding-bottom: 36px; }
   .footer-brand { grid-column: 1 / -1; }
-  .footer-brand img { height: 48px; }
+  .footer-brand img { height: 78px; }
   .footer-bottom { flex-direction: column; gap: 8px; align-items: flex-start; }
 
   .social-rail { left: auto; right: 14px; bottom: 14px; flex-direction: row; padding: 6px 10px; gap: 8px; }

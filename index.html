@@ -73,6 +73,9 @@
 
 <!-- ═══════════ THEME / NAV ═══════════ -->
 <nav class="nav" id="nav">
+  <button class="hamburger" id="hamburger" aria-label="Abrir menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
   <a class="nav-logo" href="#top">
     <img class="logo-light" src="assets/brand/logo-mark-white.png" alt="Casa do Oleiro">
     <img class="logo-dark" src="assets/brand/logo-mark-black.png" alt="Casa do Oleiro">
@@ -399,6 +402,23 @@ document.querySelectorAll('a,button,input,textarea,label').forEach(el => {
 const nav = document.getElementById('nav');
 addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 60));
 
+/* hamburger menu */
+(function () {
+  const hamburger = document.getElementById('hamburger');
+  hamburger.addEventListener('click', () => {
+    const open = hamburger.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', String(open));
+    nav.classList.toggle('nav-open', open);
+  });
+  nav.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      nav.classList.remove('nav-open');
+    });
+  });
+})();
+
 /* ───── potter scene: progress driven by full-page scroll ───── */
 const vasePath = document.getElementById('vasePath');
 const vaseLip = document.getElementById('vaseLip');
@@ -478,14 +498,38 @@ updateTilts();
 /* ───── gallery horizontal drift ───── */
 const gallery = document.getElementById('gallery');
 const strip = document.getElementById('gallery-strip');
+let galleryTouching = false;
 function updateGallery() {
-  if (!window.TWEAKS.animationsOn) return;
+  if (!window.TWEAKS.animationsOn || galleryTouching) return;
   const r = gallery.getBoundingClientRect();
   const progress = (innerHeight - r.top) / (innerHeight + r.height);
   strip.style.transform = `translateX(${-progress * 360}px)`;
 }
 addEventListener('scroll', updateGallery, { passive: true });
 updateGallery();
+
+/* ───── gallery touch drag ───── */
+(function () {
+  let startX = 0, baseOffset = 0, resumeTimer;
+  strip.addEventListener('touchstart', e => {
+    clearTimeout(resumeTimer);
+    galleryTouching = true;
+    startX = e.touches[0].clientX;
+    baseOffset = new DOMMatrix(getComputedStyle(strip).transform).m41;
+    strip.style.animation = 'none';
+    strip.style.transform = `translateX(${baseOffset}px)`;
+  }, { passive: true });
+  strip.addEventListener('touchmove', e => {
+    strip.style.transform = `translateX(${baseOffset + e.touches[0].clientX - startX}px)`;
+  }, { passive: true });
+  strip.addEventListener('touchend', () => {
+    resumeTimer = setTimeout(() => {
+      galleryTouching = false;
+      strip.style.animation = '';
+      strip.style.transform = '';
+    }, 2000);
+  });
+})();
 
 /* ───── tweaks live updates ───── */
 addEventListener('message', e => {
