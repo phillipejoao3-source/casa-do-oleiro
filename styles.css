@@ -5,7 +5,7 @@
 @import url('./colors_and_type.css');
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: clip; }
 body { font-family: var(--font-body); cursor: none; overflow-x: hidden; min-height: 100vh; }
 @media (hover: none) { body { cursor: auto; } .cursor { display: none !important; } }
 a, button { font-family: inherit; cursor: none; }
