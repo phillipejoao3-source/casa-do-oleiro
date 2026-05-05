@@ -372,6 +372,8 @@ function applyTweaks(t) {
   document.body.classList.toggle('theme-light', t.theme === 'light');
 }
 applyTweaks(window.TWEAKS);
+/* Mobile starts in light theme */
+if (window.innerWidth <= 900) { window.TWEAKS.theme = 'light'; applyTweaks(window.TWEAKS); }
 
 /* theme toggle */
 function fireThemeToggle() {

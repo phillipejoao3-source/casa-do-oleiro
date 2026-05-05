@@ -495,12 +495,18 @@ body.motion-off .gallery-strip { animation-play-state: paused; }
   .nav .nav-cta { display: none; }
 
   /* Hero toggle — visible on mobile, sits above the eyebrow */
-  .theme-toggle--hero { display: flex; position: static; width: 38px; height: 22px; margin-bottom: 14px; }
+  .theme-toggle--hero { display: block; position: relative; width: 38px; height: 22px; margin-bottom: 14px; }
   .theme-toggle--hero span { width: 16px; height: 16px; }
   body.theme-light .theme-toggle--hero span { transform: translateX(16px); }
 
   /* Bigger potter scene on mobile so it reads as the hero backdrop */
   .potter-bg svg { width: 130vw; max-width: none; }
+  /* Light theme: darker stroke + thinner vignette so the animation reads clearly */
+  body.theme-light .potter-bg svg { color: rgba(0,0,0,.72); }
+  body.theme-light .potter-bg-vignette { background: radial-gradient(ellipse at center, transparent 20%, rgba(250,250,249,.22) 100%); }
+  /* Dark theme: remove panel blur so the potter animation shows through while scrolling */
+  body.theme-dark .panel-translucent,
+  body.theme-dark .panel-solid { backdrop-filter: none; -webkit-backdrop-filter: none; }
 
   /* Hero — top pad accounts for bigger logo nav (~112px) */
   .hero { padding: 112px 20px 60px; min-height: 100vh; justify-content: flex-start; }
