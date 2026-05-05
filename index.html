@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Casa do Oleiro — Moldados pelo Oleiro</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body class="theme-dark">
+
+<div class="cursor" id="cursor"></div>
+
+<!-- ═══════════ FIXED POTTER BACKGROUND ═══════════ -->
+<div class="potter-bg" id="potter-bg" aria-hidden="true">
+  <svg id="potter-scene" viewBox="0 0 800 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- single stroke style for everything -->
+    </defs>
+    <!-- Wheel base / pedestal -->
+    <g id="wheel" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <ellipse cx="400" cy="540" rx="220" ry="22"/>
+      <ellipse cx="400" cy="540" rx="180" ry="16" opacity=".5"/>
+      <line x1="280" y1="540" x2="320" y2="640"/>
+      <line x1="520" y1="540" x2="480" y2="640"/>
+      <ellipse cx="400" cy="640" rx="120" ry="10" opacity=".4"/>
+      <!-- subtle motion ticks on rim -->
+      <line x1="220" y1="540" x2="210" y2="540" opacity=".4"/>
+      <line x1="580" y1="540" x2="590" y2="540" opacity=".4"/>
+    </g>
+
+    <!-- Vase — morphs along scroll -->
+    <g id="vase-g" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path id="vasePath" d=""/>
+      <ellipse id="vaseLip" cx="400" cy="0" rx="0" ry="0" stroke="currentColor" stroke-width="1.4" opacity="0"/>
+      <!-- centerline whisper -->
+      <line id="vaseCenter" x1="400" y1="0" x2="400" y2="540" stroke-dasharray="2 6" opacity=".18"/>
+    </g>
+
+    <!-- Hands — stencil outlines, hinted, not detailed -->
+    <g id="hands" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0">
+      <!-- LEFT HAND -->
+      <g id="hand-left">
+        <path d="M 180 470 Q 165 455 175 430 Q 195 395 240 380 Q 275 370 305 380"/>
+        <path d="M 175 430 Q 168 410 178 395" opacity=".7"/>
+        <path d="M 305 380 Q 320 372 332 378" opacity=".7"/>
+        <path d="M 200 410 Q 220 400 245 402" opacity=".55"/>
+        <path d="M 215 425 Q 235 418 258 420" opacity=".4"/>
+        <!-- wrist hint -->
+        <path d="M 145 490 Q 160 480 178 475" opacity=".5"/>
+      </g>
+      <!-- RIGHT HAND (mirrored) -->
+      <g id="hand-right">
+        <path d="M 620 470 Q 635 455 625 430 Q 605 395 560 380 Q 525 370 495 380"/>
+        <path d="M 625 430 Q 632 410 622 395" opacity=".7"/>
+        <path d="M 495 380 Q 480 372 468 378" opacity=".7"/>
+        <path d="M 600 410 Q 580 400 555 402" opacity=".55"/>
+        <path d="M 585 425 Q 565 418 542 420" opacity=".4"/>
+        <path d="M 655 490 Q 640 480 622 475" opacity=".5"/>
+      </g>
+    </g>
+
+    <!-- Lump of clay (initial state, fades out) -->
+    <g id="clay" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path id="clayPath" d="M 350 540 Q 340 510 360 495 Q 400 488 440 498 Q 460 510 450 540 Z"/>
+    </g>
+  </svg>
+  <!-- soft vignette over the bg, theme-aware -->
+  <div class="potter-bg-vignette"></div>
+</div>
+
+<!-- ═══════════ THEME / NAV ═══════════ -->
+<nav class="nav" id="nav">
+  <a class="nav-logo" href="#top">
+    <img class="logo-light" src="assets/brand/logo-mark-white.png" alt="Casa do Oleiro">
+    <img class="logo-dark" src="assets/brand/logo-mark-black.png" alt="Casa do Oleiro">
+    <span class="locale-tag">US</span>
+  </a>
+  <div class="nav-links">
+    <a href="#mission">Sobre</a>
+    <a href="#times">Cultos</a>
+    <a href="#groups">Grupos</a>
+    <a href="#pastors">Pastores</a>
+    <a href="#prayer">Oração</a>
+    <a href="#give">Doar</a>
+  </div>
+  <button class="theme-toggle" id="theme-toggle" aria-label="Alternar tema"><span></span></button>
+  <a href="#prayer" class="nav-cta">Visite-nos</a>
+</nav>
+
+<!-- Floating social rail — always visible, theme-aware -->
+<div class="social-rail" aria-label="Redes sociais">
+  <a href="https://instagram.com/casadooleiro" target="_blank" rel="noopener" aria-label="Instagram">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="currentColor"></circle></svg>
+  </a>
+  <a href="https://youtube.com/@casadooleiro" target="_blank" rel="noopener" aria-label="YouTube">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"></rect><path d="M10 9.5 L15 12 L10 14.5 Z" fill="currentColor" stroke="none"></path></svg>
+  </a>
+  <a href="https://facebook.com/casadooleiro" target="_blank" rel="noopener" aria-label="Facebook">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8h2.5V5H14c-2 0-3 1.2-3 3v2H9v3h2v8h3v-8h2.5l.5-3H14V8.5c0-.3.2-.5.5-.5z"></path></svg>
+  </a>
+</div>
+
+<main class="overlay">
+
+<!-- ═════ HERO ═════ -->
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <button class="theme-toggle theme-toggle--hero" id="theme-toggle-hero" aria-label="Alternar tema"><span></span></button>
+    <div class="hero-eyebrow" data-hero="eyebrow">Igreja em Marietta, GA</div>
+    <h1 class="hero-title" data-hero="title">Moldados<br><em>pelo</em> Oleiro</h1>
+    <div class="hero-photo tilt-r" data-parallax="0.15">
+      <img src="assets/church/IMG_8710.jpg" alt="">
+    </div>
+    <div class="hero-meta">
+      <div class="meta-block"><div class="meta-label">Quintas</div><div class="meta-value">20:00</div></div>
+      <div class="meta-block"><div class="meta-label">Domingos</div><div class="meta-value">19:30</div></div>
+      <div class="meta-block"><div class="meta-label">Onde</div><div class="meta-value">Marietta, GA</div></div>
+    </div>
+    <a class="hero-addr-sm" href="https://maps.google.com/?q=2141+Kingston+CT+SE+Suite+108+Marietta+GA+30067" target="_blank" rel="noopener">2141 Kingston CT SE, Ste 108 · Marietta, GA 30067</a>
+    <a class="hero-visit-cta nav-cta" href="#prayer">Visite-nos</a>
+  </div>
+  <div class="scroll-hint"><span class="line"></span>Role para baixo</div>
+</section>
+
+<!-- ═════ MISSION ═════ -->
+<section class="mission panel-translucent" id="mission" data-screen-label="02 Mission">
+  <div class="wrap">
+    <div class="eyebrow">Nossa missão</div>
+    <p class="mission-quote">
+      <span class="underline">Restaurar vidas</span> e <em>espalhar</em> o evangelho — uma comunidade brasileira em Marietta, convencida de que ninguém é descartável nas mãos do Oleiro.
+    </p>
+    <span class="mission-ref">Jeremias 18:6</span>
+  </div>
+</section>
+
+<!-- ═════ POTTER NARRATIVE (scroll-pinned text on top of bg) ═════ -->
+<section class="narrative" id="narrative" data-screen-label="03 Narrative">
+  <!-- Etapa 1: card far-left · photo far-right -->
+  <div class="narrative-step with-photo"><div class="step-card">
+    <div class="eyebrow">Etapa 1 · O barro</div>
+    <h2>Tudo começa com um pedaço de barro.</h2>
+    <p>O Oleiro pega o que o mundo descartou e começa a moldar. Não precisa ser perfeito. Só precisa estar nas mãos certas.</p>
+  </div><div class="tilt-photo tilt-l" data-parallax="0.25"><img src="assets/church/IMG_8708.jpg" alt=""></div></div>
+  <!-- Etapa 2: photo far-left · card far-right -->
+  <div class="narrative-step with-photo"><div class="tilt-photo tilt-r" data-parallax="-0.2"><img src="assets/church/IMG_8709.jpg" alt=""></div><div class="step-card">
+    <div class="eyebrow">Etapa 2 · Centrar</div>
+    <h2>Ele te coloca no centro da roda.</h2>
+    <p>A pressão das mãos d'Ele alinha o que estava torto. Dói um pouco. Mas é assim que se começa qualquer coisa que vai durar.</p>
+  </div></div>
+  <!-- Etapa 3: card far-left · photo far-right -->
+  <div class="narrative-step with-photo"><div class="step-card">
+    <div class="eyebrow">Etapa 3 · Moldar</div>
+    <h2>O barro sobe, e o vaso aparece.</h2>
+    <p>Cada um de nós é único — moldado para conter algo que só nós podemos carregar.</p>
+  </div><div class="tilt-photo tilt-l" data-parallax="0.22"><img src="assets/church/IMG_8714.jpg" alt=""></div></div>
+  <!-- Etapa 4: card far-right · no photo -->
+  <div class="narrative-step alt"><div class="step-card">
+    <div class="eyebrow">Etapa 4 · O vaso</div>
+    <h2>Pronto pra ser cheio.</h2>
+    <p>Vasos não existem pra serem admirados — existem pra carregar água viva. Esta é a Casa onde o barro vira vaso.</p>
+  </div></div>
+</section>
+
+<!-- ═════ TIMES ═════ -->
+<section class="times panel-solid" id="times" data-screen-label="04 Times">
+  <div class="wrap">
+    <div class="eyebrow">Cultos</div>
+    <h2 class="section-title">Quando<br>nos reunimos</h2>
+    <div class="times-grid">
+      <div class="service-list">
+        <div class="service">
+          <span class="service-num">01</span>
+          <span class="service-name">Quinta-feira · Culto</span>
+          <span class="service-time">20:00</span>
+        </div>
+        <div class="service">
+          <span class="service-num">02</span>
+          <span class="service-name">Domingo · Culto principal</span>
+          <span class="service-time">19:30</span>
+        </div>
+        <div class="service">
+          <span class="service-num">03</span>
+          <span class="service-name">Pequenos grupos</span>
+          <span class="service-time service-time--note">Durante a semana</span>
+        </div>
+      </div>
+      <div class="location-card">
+        <div class="label">Onde</div>
+        <h3>2141 Kingston CT SE<br>Suite 108</h3>
+        <p>Marietta, GA 30067 — Use a entrada lateral e procure pela Suite 108.</p>
+        <a href="https://maps.google.com/?q=2141+Kingston+CT+SE+Suite+108+Marietta+GA+30067" target="_blank" rel="noopener">Como chegar →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ GALLERY ═════ -->
+<section class="gallery panel-translucent" id="gallery" data-screen-label="05 Gallery">
+  <div class="gallery-head wrap">
+    <div class="eyebrow">Nossa família</div>
+    <h2 class="section-title">Pertencer<br>é começar.</h2>
+  </div>
+  <div class="gallery-strip" id="gallery-strip">
+    <div class="gallery-card tall"><img src="assets/church/IMG_8710.jpg" alt="Adoração"><div class="ph"><span class="lbl">Adoração</span></div></div>
+    <div class="gallery-card wide"><img src="assets/church/IMG_8712.jpg" alt="Juventude" style="object-position: center 30%;"><div class="ph"><span class="lbl">Juventude</span></div></div>
+    <div class="gallery-card sq"><img src="assets/church/IMG_8711.jpg" alt="Crianças"><div class="ph"><span class="lbl">Crianças</span></div></div>
+    <div class="gallery-card tall"><img src="assets/church/IMG_8714.jpg" alt="Oração" style="object-position: center 20%;"><div class="ph"><span class="lbl">Oração</span></div></div>
+    <div class="gallery-card wide"><img src="assets/church/IMG_8708.jpg" alt="Santa Ceia"><div class="ph"><span class="lbl">Santa Ceia</span></div></div>
+    <div class="gallery-card sq"><img src="assets/church/IMG_8709.jpg" alt="Louvor" style="object-position: center 25%;"><div class="ph"><span class="lbl">Louvor</span></div></div>
+    <div class="gallery-card tall"><img src="assets/church/IMG_8713.jpg" alt="Palavra" style="object-position: center 20%;"><div class="ph"><span class="lbl">Palavra</span></div></div>
+    <div class="gallery-card wide"><img src="assets/church/IMG_8712.jpg" alt="Comunidade" style="object-position: center 40%;"><div class="ph"><span class="lbl">Comunidade</span></div></div>
+  </div>
+</section>
+
+<!-- ═════ PASTORS ═════ -->
+<section class="pastors panel-translucent" id="pastors" data-screen-label="03b Pastors">
+  <div class="wrap">
+    <div class="eyebrow">Liderança</div>
+    <h2 class="section-title">Nossos<br>pastores</h2>
+    <p class="pastors-intro">Quem está à frente da Casa, orando, ensinando e cuidando da família.</p>
+    <div class="pastors-grid">
+      <div class="pastor-card">
+        <div class="pastor-photo tilt-l" data-parallax="0.12"><img src="IMG_4228.JPG" alt="Pastor Jairo" style="object-position: center 20%;"></div>
+        <div class="pastor-meta">
+          <span class="meta-label">Pastor titular</span>
+          <h3>PR Jairo</h3>
+          <p>Coordena os cultos, o ensino da Palavra e o cuidado pastoral da Casa.</p>
+        </div>
+      </div>
+      <div class="pastor-card">
+        <div class="pastor-photo tilt-r" data-parallax="-0.12"><img src="assets/church/IMG_8713.jpg" alt="Pastora Jael" style="object-position: center 30%;"></div>
+        <div class="pastor-meta">
+          <span class="meta-label">Pastora</span>
+          <h3>PR Jael</h3>
+          <p>Lidera o trabalho com famílias, mulheres e o time de intercessão da igreja.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ GROUPS ═════ -->
+<section class="groups panel-solid" id="groups" data-screen-label="06 Groups">
+  <div class="wrap">
+    <div class="eyebrow">Conexão</div>
+    <h2 class="section-title">Pequenos grupos,<br>grandes histórias.</h2>
+    <div class="groups-grid">
+      <a href="#" class="group-card">
+        <span class="meta-label">01 · Pequenos grupos</span>
+        <h3>Casas abertas, semana inteira</h3>
+        <p>Reuniões em casas de famílias por Marietta e cidades vizinhas. Bíblia aberta, café passado, e um lugar pra você ser conhecido pelo nome.</p>
+        <span class="arrow">Ver grupos</span>
+      </a>
+      <a href="#" class="group-card featured">
+        <span class="meta-label">02 · Juventude</span>
+        <h3>Geração Oleiro</h3>
+        <p>Jovens dos 13 aos 25. Cultos próprios, retiros, e uma comunidade que entende o que é crescer hoje, com a Bíblia na mão.</p>
+        <span class="arrow">Saiba mais</span>
+      </a>
+      <a href="https://wa.me/" class="group-card whatsapp" target="_blank" rel="noopener">
+        <span class="meta-label">03 · WhatsApp</span>
+        <h3>Entre no nosso grupo</h3>
+        <p>Avisos de cultos, palavras da semana, pedidos de oração e tudo que rola na família Casa do Oleiro — direto no seu WhatsApp.</p>
+        <span class="arrow">Entrar no grupo</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ PRAYER ═════ -->
+<section class="prayer panel-translucent" id="prayer" data-screen-label="07 Prayer">
+  <div class="wrap">
+    <div class="eyebrow">Time de intercessão</div>
+    <div class="prayer-grid">
+      <div class="prayer-copy">
+        <h2>Vamos <em>orar</em><br>por você.</h2>
+        <p>Conte pra gente o que está pesando no seu coração. Nosso time de intercessão recebe seu pedido em silêncio, com cuidado, e ora durante a semana — sem julgamento, sem pauta.</p>
+        <div class="prayer-team">
+          <div class="prayer-avatars">
+            <div class="av av-1"></div><div class="av av-2"></div><div class="av av-3"></div><div class="av av-4"></div>
+          </div>
+          <div class="prayer-team-meta"><strong>12 intercessores</strong><br>orando esta semana</div>
+        </div>
+      </div>
+      <form class="prayer-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Pedido recebido. Estamos orando.'; this.querySelector('button').classList.add('sent');">
+        <div class="field"><label>Seu nome</label><input type="text" placeholder="Como podemos te chamar?" required></div>
+        <div class="field"><label>WhatsApp ou Email</label><input type="text" placeholder="(770) 000-0000" required></div>
+        <div class="field"><label>Pedido de oração</label><textarea placeholder="Por favor, orem por…" required></textarea></div>
+        <label class="check"><input type="checkbox"> Quero receber uma palavra do time durante a semana</label>
+        <label class="check"><input type="checkbox"> Manter anônimo para o time</label>
+        <button type="submit" class="prayer-submit">Enviar pedido</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ GIVE (Zelle) ═════ -->
+<section class="give panel-solid" id="give" data-screen-label="08 Give">
+  <div class="give-card">
+    <div class="give-copy">
+      <div class="eyebrow give-eyebrow">Generosidade</div>
+      <h2>Semeie<br>com a gente</h2>
+      <p>Sua oferta sustenta os cultos, projetos sociais aqui em Marietta e o cuidado pastoral com cada família da Casa.</p>
+    </div>
+    <div class="give-actions">
+      <div class="zelle-card">
+        <div class="zelle-head">
+          <span class="zelle-tag">Zelle</span>
+          <span class="zelle-label">Doação principal</span>
+        </div>
+        <div class="zelle-email">give@casadooleiro.org</div>
+        <button class="zelle-copy" onclick="navigator.clipboard?.writeText('give@casadooleiro.org'); this.textContent='Copiado'; setTimeout(()=>this.textContent='Copiar email',2000)">Copiar email</button>
+      </div>
+      <a href="#" class="recur">Doação recorrente</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ NEWSLETTER ═════ -->
+<section class="newsletter panel-solid" id="news" data-screen-label="09 Newsletter">
+  <div class="newsletter-inner">
+    <div class="eyebrow">Fique perto</div>
+    <h2>Uma palavra na sua semana.</h2>
+    <p>Devocional curto + agenda da igreja, todo domingo de manhã. Sem spam.</p>
+    <form onsubmit="event.preventDefault(); this.querySelector('button').textContent='Inscrito';">
+      <input type="email" placeholder="seu@email.com" required>
+      <button type="submit">Inscrever</button>
+    </form>
+  </div>
+</section>
+
+<!-- ═════ FOOTER ═════ -->
+<footer class="footer panel-solid">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img class="logo-light" src="assets/brand/logo-mark-white.png" alt="">
+        <img class="logo-dark" src="assets/brand/logo-mark-black.png" alt="">
+        <p>Uma comunidade brasileira em Marietta, GA. Moldados pelas mãos do Oleiro.</p>
+      </div>
+      <div class="footer-col"><h4>Igreja</h4><ul><li><a href="#mission">Sobre</a></li><li><a href="#times">Cultos</a></li><li><a href="#groups">Grupos</a></li></ul></div>
+      <div class="footer-col"><h4>Conecte</h4><ul><li><a href="#prayer">Oração</a></li><li><a href="https://wa.me/" target="_blank">WhatsApp</a></li><li><a href="#news">Newsletter</a></li><li><a href="#give">Doar (Zelle)</a></li></ul></div>
+      <div class="footer-col"><h4>Contato</h4><ul><li>2141 Kingston CT SE, Suite 108</li><li>Marietta, GA 30067</li><li>Quintas · 20:00</li><li>Domingos · 19:30</li><li><a href="mailto:contato@casadooleiro.org">contato@casadooleiro.org</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Casa do Oleiro · Marietta, GA</span><span>Jeremias 18:6</span></div>
+  </div>
+</footer>
+</main>
+
+<!-- Tweaks panel -->
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<div id="tweaks-root"></div>
+
+<script>
+window.TWEAKS = /*EDITMODE-BEGIN*/{
+  "heroEyebrow": "Igreja em Marietta, GA",
+  "heroTitleLine1": "Moldados",
+  "heroTitleLine2": "pelo Oleiro",
+  "animationsOn": true,
+  "potterSpeed": 1,
+  "theme": "dark"
+}/*EDITMODE-END*/;
+
+function applyTweaks(t) {
+  document.querySelector('[data-hero="eyebrow"]').textContent = t.heroEyebrow;
+  document.querySelector('[data-hero="title"]').innerHTML = `${t.heroTitleLine1}<br><em>pelo</em> ${t.heroTitleLine2.replace(/^pelo\s+/i,'')}`;
+  document.body.classList.toggle('motion-off', !t.animationsOn);
+  document.body.classList.toggle('theme-dark', t.theme === 'dark');
+  document.body.classList.toggle('theme-light', t.theme === 'light');
+}
+applyTweaks(window.TWEAKS);
+
+/* theme toggle */
+function fireThemeToggle() {
+  const next = document.body.classList.contains('theme-dark') ? 'light' : 'dark';
+  window.TWEAKS.theme = next;
+  applyTweaks(window.TWEAKS);
+  window.parent?.postMessage({ type: '__edit_mode_set_keys', edits: { theme: next } }, '*');
+}
+document.getElementById('theme-toggle').addEventListener('click', fireThemeToggle);
+document.getElementById('theme-toggle-hero').addEventListener('click', fireThemeToggle);
+
+/* cursor */
+const cursor = document.getElementById('cursor');
+let cx = innerWidth/2, cy = innerHeight/2, tx = cx, ty = cy;
+addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; });
+(function tick() { cx += (tx-cx)*.25; cy += (ty-cy)*.25; cursor.style.transform = `translate(${cx}px,${cy}px) translate(-50%,-50%)`; requestAnimationFrame(tick); })();
+document.querySelectorAll('a,button,input,textarea,label').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+});
+
+/* nav scrolled state */
+const nav = document.getElementById('nav');
+addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 60));
+
+/* ───── potter scene: progress driven by full-page scroll ───── */
+const vasePath = document.getElementById('vasePath');
+const vaseLip = document.getElementById('vaseLip');
+const vaseCenter = document.getElementById('vaseCenter');
+const handsG = document.getElementById('hands');
+const clayPath = document.getElementById('clayPath');
+
+function lerp(a,b,t){return a+(b-a)*t;}
+function vaseShape(p) {
+  // p ∈ [0,1] → from lump on wheel to tall vase
+  const cy = 540, cx = 400;
+  const baseW = lerp(50, 80, p);
+  const bellyW = lerp(55, 170, p);
+  const neckW = lerp(55, 90, Math.max(0, p-.3)/.7);
+  const lipW = lerp(55, 130, Math.max(0, p-.45)/.55);
+  const bellyY = lerp(520, 320, p);
+  const neckY = lerp(515, 200, p);
+  const lipY = lerp(510, 110, p);
+  const d = `M ${cx-baseW} ${cy}
+    C ${cx-bellyW} ${bellyY+30} ${cx-bellyW} ${bellyY-20} ${cx-neckW} ${neckY}
+    C ${cx-lipW-12} ${lipY+30} ${cx-lipW-4} ${lipY+8} ${cx-lipW} ${lipY}
+    L ${cx+lipW} ${lipY}
+    C ${cx+lipW+4} ${lipY+8} ${cx+lipW+12} ${lipY+30} ${cx+neckW} ${neckY}
+    C ${cx+bellyW} ${bellyY-20} ${cx+bellyW} ${bellyY+30} ${cx+baseW} ${cy}`;
+  return { d, lipW, lipY };
+}
+
+function updateScene() {
+  if (!window.TWEAKS.animationsOn) return;
+  const max = document.documentElement.scrollHeight - innerHeight;
+  // Map scroll progress: hero (0-15%) just clay → narrative steps (15-65%) shape grows → after that full vase holds
+  const raw = Math.max(0, Math.min(1, scrollY / max));
+  const speed = window.TWEAKS.potterSpeed || 1;
+  let p;
+  if (raw < .12) p = 0;
+  else if (raw < .65) p = Math.pow((raw - .12) / .53, 1/speed);
+  else p = 1;
+  const { d, lipW, lipY } = vaseShape(p);
+  vasePath.setAttribute('d', d);
+  vaseLip.setAttribute('cx', 400);
+  vaseLip.setAttribute('cy', lipY);
+  vaseLip.setAttribute('rx', lipW);
+  vaseLip.setAttribute('ry', Math.max(2, lipW * .14));
+  vaseLip.setAttribute('opacity', p > .5 ? Math.min(.55, (p - .5) * 1.4) : 0);
+  vaseCenter.setAttribute('y1', lipY);
+  // hands stay visible from start of shaping to end of page
+  let handsOpacity = 0;
+  if (p > .03) handsOpacity = Math.min(1, p * 4);
+  handsG.setAttribute('opacity', handsOpacity);
+  // clay lump fades out
+  clayPath.setAttribute('opacity', Math.max(0, 1 - p * 3));
+  // gentle wheel-spin micro-rotation on the whole scene
+  document.getElementById('potter-scene').style.setProperty('--spin', (raw * 6) + 'deg');
+}
+addEventListener('scroll', updateScene, { passive: true });
+addEventListener('resize', updateScene);
+updateScene();
+
+/* ───── tilted photo parallax ───── */
+const tilts = document.querySelectorAll('[data-parallax]');
+function updateTilts() {
+  if (!window.TWEAKS.animationsOn) return;
+  tilts.forEach(el => {
+    const r = el.getBoundingClientRect();
+    const center = r.top + r.height/2 - innerHeight/2;
+    const factor = parseFloat(el.dataset.parallax || 0);
+    const y = center * factor * -1;
+    const baseRot = el.classList.contains('tilt-r') ? 6 : -7;
+    const rotDelta = (center / innerHeight) * 4;
+    el.style.transform = `translateY(${y}px) rotate(${baseRot + rotDelta}deg)`;
+  });
+}
+addEventListener('scroll', updateTilts, { passive: true });
+addEventListener('resize', updateTilts);
+updateTilts();
+
+/* ───── gallery horizontal drift ───── */
+const gallery = document.getElementById('gallery');
+const strip = document.getElementById('gallery-strip');
+function updateGallery() {
+  if (!window.TWEAKS.animationsOn) return;
+  const r = gallery.getBoundingClientRect();
+  const progress = (innerHeight - r.top) / (innerHeight + r.height);
+  strip.style.transform = `translateX(${-progress * 360}px)`;
+}
+addEventListener('scroll', updateGallery, { passive: true });
+updateGallery();
+
+/* ───── tweaks live updates ───── */
+addEventListener('message', e => {
+  if (e.data?.type === '__edit_mode_keys_updated' && e.data.edits) {
+    Object.assign(window.TWEAKS, e.data.edits);
+    applyTweaks(window.TWEAKS);
+    updateScene();
+  }
+});
+</script>
+
+<script type="text/babel">
+function TweaksUI() {
+  const [t, setTweak] = useTweaks(window.TWEAKS);
+  React.useEffect(() => { applyTweaks(t); updateScene(); }, [t]);
+  return (
+    <TweaksPanel title="Tweaks">
+      <TweakSection title="Hero">
+        <TweakText label="Eyebrow" value={t.heroEyebrow} onChange={v => setTweak('heroEyebrow', v)} />
+        <TweakText label="Title line 1" value={t.heroTitleLine1} onChange={v => setTweak('heroTitleLine1', v)} />
+        <TweakText label="Title line 2" value={t.heroTitleLine2} onChange={v => setTweak('heroTitleLine2', v)} />
+      </TweakSection>
+      <TweakSection title="Theme">
+        <TweakRadio label="Background" value={t.theme} options={[{value:'dark',label:'Dark'},{value:'light',label:'Light'}]} onChange={v => setTweak('theme', v)} />
+      </TweakSection>
+      <TweakSection title="Motion">
+        <TweakToggle label="Scroll animations" value={t.animationsOn} onChange={v => setTweak('animationsOn', v)} />
+        <TweakSlider label="Potter speed" min={0.5} max={2.5} step={0.1} value={t.potterSpeed} onChange={v => setTweak('potterSpeed', v)} />
+      </TweakSection>
+    </TweaksPanel>
+  );
+}
+ReactDOM.createRoot(document.getElementById('tweaks-root')).render(<TweaksUI/>);
+</script>
+</body>
+</html>
