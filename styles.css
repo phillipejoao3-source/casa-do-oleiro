@@ -316,6 +316,21 @@ section { position: relative; }
 }
 body.motion-off .gallery-strip { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .gallery-strip { animation-play-state: paused; } }
+
+/* gallery full-page link */
+.gallery-more-link { padding: 0 40px; margin-top: 48px; }
+.gallery-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 28px; border-radius: 999px;
+  border: 1.5px solid var(--card-border);
+  color: var(--fg); text-decoration: none;
+  font-size: 11px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase;
+  transition: border-color .2s, color .2s, background .2s;
+  cursor: none;
+}
+.gallery-cta:hover { border-color: var(--orange-500); color: var(--orange-500); }
+.gallery-cta .arrow { font-size: 14px; transition: transform .25s var(--ease-out); }
+.gallery-cta:hover .arrow { transform: translateX(4px); }
 .gallery-card { flex: none; border-radius: 12px; overflow: hidden; position: relative; }
 .gallery-card.tall { width: 320px; height: 440px; }
 .gallery-card.wide { width: 480px; height: 340px; }

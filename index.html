@@ -216,6 +216,13 @@
     <div class="gallery-card tall"><img src="assets/church/IMG_8713.jpg" alt="Palavra" style="object-position: center 20%;"><div class="ph"><span class="lbl">Palavra</span></div></div>
     <div class="gallery-card wide"><img src="assets/church/IMG_8712.jpg" alt="Comunidade" style="object-position: center 40%;"><div class="ph"><span class="lbl">Comunidade</span></div></div>
   </div>
+
+  <div class="gallery-more-link wrap">
+    <a href="gallery.html" class="gallery-cta">
+      <span class="lbl">Ver galeria completa</span>
+      <span class="arrow">→</span>
+    </a>
+  </div>
 </section>
 
 <!-- ═════ PASTORS ═════ -->
@@ -263,11 +270,11 @@
         <p>Jovens dos 13 aos 25. Cultos próprios, retiros, e uma comunidade que entende o que é crescer hoje, com a Bíblia na mão.</p>
         <span class="arrow">Saiba mais</span>
       </a>
-      <a href="https://wa.me/" class="group-card whatsapp" target="_blank" rel="noopener">
-        <span class="meta-label">03 · WhatsApp</span>
-        <h3>Entre no nosso grupo</h3>
-        <p>Avisos de cultos, palavras da semana, pedidos de oração e tudo que rola na família Casa do Oleiro — direto no seu WhatsApp.</p>
-        <span class="arrow">Entrar no grupo</span>
+      <a href="#prayer" class="group-card">
+        <span class="meta-label">03 · Oração Online</span>
+        <h3>Ore com<br>a gente</h3>
+        <p>Nossa equipe de intercessão ora pelos seus pedidos durante a semana — sem julgamento, sem pauta. Envie o seu pedido agora.</p>
+        <span class="arrow">Enviar pedido de oração</span>
       </a>
     </div>
   </div>
@@ -283,9 +290,9 @@
         <p>Conte pra gente o que está pesando no seu coração. Nosso time de intercessão recebe seu pedido em silêncio, com cuidado, e ora durante a semana — sem julgamento, sem pauta.</p>
         <div class="prayer-team">
           <div class="prayer-avatars">
-            <div class="av av-1"></div><div class="av av-2"></div><div class="av av-3"></div><div class="av av-4"></div>
+            <div class="av av-1"></div><div class="av av-2"></div><div class="av av-3"></div>
           </div>
-          <div class="prayer-team-meta"><strong>12 intercessores</strong><br>orando esta semana</div>
+          <div class="prayer-team-meta"><strong>3 intercessores</strong><br>orando esta semana</div>
         </div>
       </div>
       <form class="prayer-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Pedido recebido. Estamos orando.'; this.querySelector('button').classList.add('sent');">
@@ -317,7 +324,6 @@
         <div class="zelle-email">(754) 264-6067</div>
         <button class="zelle-copy" onclick="navigator.clipboard?.writeText('7542646067'); this.textContent='Copiado'; setTimeout(()=>this.textContent='Copiar número',2000)">Copiar número</button>
       </div>
-      <a href="#" class="recur">Doação recorrente</a>
     </div>
   </div>
 </section>
@@ -375,8 +381,6 @@ function applyTweaks(t) {
   document.body.classList.toggle('theme-light', t.theme === 'light');
 }
 applyTweaks(window.TWEAKS);
-/* Mobile starts in light theme */
-if (window.innerWidth <= 900) { window.TWEAKS.theme = 'light'; applyTweaks(window.TWEAKS); }
 
 /* theme toggle */
 function fireThemeToggle() {
@@ -508,26 +512,51 @@ function updateGallery() {
 addEventListener('scroll', updateGallery, { passive: true });
 updateGallery();
 
-/* ───── gallery touch drag ───── */
+/* ───── gallery touch drag + momentum ───── */
 (function () {
-  let startX = 0, baseOffset = 0, resumeTimer;
+  let offset = 0, lastX = 0, lastTime = 0, velocity = 0;
+  let momentumId, resumeTimer;
+
   strip.addEventListener('touchstart', e => {
     clearTimeout(resumeTimer);
+    cancelAnimationFrame(momentumId);
     galleryTouching = true;
-    startX = e.touches[0].clientX;
-    baseOffset = new DOMMatrix(getComputedStyle(strip).transform).m41;
+    offset = new DOMMatrix(getComputedStyle(strip).transform).m41;
+    lastX = e.touches[0].clientX;
+    lastTime = Date.now();
+    velocity = 0;
     strip.style.animation = 'none';
-    strip.style.transform = `translateX(${baseOffset}px)`;
+    strip.style.transform = `translateX(${offset}px)`;
   }, { passive: true });
+
   strip.addEventListener('touchmove', e => {
-    strip.style.transform = `translateX(${baseOffset + e.touches[0].clientX - startX}px)`;
+    const x = e.touches[0].clientX;
+    const now = Date.now();
+    const dt = Math.max(now - lastTime, 1);
+    const dx = x - lastX;
+    velocity = dx / dt;
+    offset += dx;
+    lastX = x;
+    lastTime = now;
+    strip.style.transform = `translateX(${offset}px)`;
   }, { passive: true });
+
   strip.addEventListener('touchend', () => {
-    resumeTimer = setTimeout(() => {
-      galleryTouching = false;
-      strip.style.animation = '';
-      strip.style.transform = '';
-    }, 2000);
+    let vel = velocity * 16;
+    function coast() {
+      vel *= 0.94;
+      offset += vel;
+      strip.style.transform = `translateX(${offset}px)`;
+      if (Math.abs(vel) > 0.4) {
+        momentumId = requestAnimationFrame(coast);
+      } else {
+        resumeTimer = setTimeout(() => {
+          galleryTouching = false;
+          strip.style.animation = '';
+        }, 1200);
+      }
+    }
+    momentumId = requestAnimationFrame(coast);
   });
 })();
 
