@@ -121,19 +121,28 @@
 .back-cta:focus-visible { outline: 2px solid var(--orange-500); outline-offset: 3px; }
 .back-cta .arrow { font-size: 18px; }
 
+/* ── Scroll hint (mobile only) ── */
+.scroll-hint { display: none; }
+
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); opacity: .7; }
+  50%       { transform: translateY(7px); opacity: 1; }
+}
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
-  .gallery-header { padding: 100px 20px 40px; }
-  /* title fits mobile viewport */
+  /* compact header so first photo is visible without scrolling */
+  .gallery-header { padding: 74px 20px 16px; }
   .gallery-title { font-size: clamp(44px, 11vw, 64px); }
-  .gallery-lede { font-size: 15px; }
-  /* social rail overlaps content on mobile — hide it; links are in the nav */
+  .gallery-lede { display: none; }
+  /* hide section nav rail on mobile */
+  .section-rail { display: none; }
+  /* social rail overlaps content on mobile */
   .gallery-page .social-rail { display: none; }
-  .section-rail { margin: 0 16px 40px; padding: 10px 12px; top: 76px; overflow-x: auto; justify-content: flex-start; flex-wrap: nowrap; border-radius: 12px; }
-  .section-rail a { padding: 6px 10px; font-size: 10px; letter-spacing: .14em; white-space: nowrap; }
-  .g-section { padding: 40px 20px 80px; }
-  .g-section-head { grid-template-columns: 1fr; gap: 8px; margin-bottom: 32px; }
-  .g-num { font-size: 36px; }
+  .g-section { padding: 32px 20px 60px; }
+  .g-section-head { grid-template-columns: 1fr; gap: 6px; margin-bottom: 20px; }
+  .g-section-head p { display: none; }
+  .g-num { font-size: 32px; }
   .g-grid { grid-template-columns: repeat(6, 1fr); grid-auto-rows: 100px; gap: 10px; }
   .g-card.r1 { grid-column: span 6; grid-row: span 3; }
   .g-card.r2 { grid-column: span 3; grid-row: span 2; }
@@ -145,4 +154,14 @@
   /* override inline span for Jovens tall card */
   #jovens .g-card:last-child { grid-column: span 6 !important; grid-row: span 4 !important; }
   .g-footer-cta { padding: 60px 20px 80px; }
+  /* scroll hint */
+  .scroll-hint {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    color: var(--fg-muted); font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+    z-index: 80; pointer-events: none;
+    animation: scroll-bounce 1.6s ease-in-out infinite;
+    transition: opacity .4s;
+  }
+  .scroll-hint.hidden { opacity: 0; }
 }
