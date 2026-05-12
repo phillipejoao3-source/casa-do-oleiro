@@ -123,18 +123,26 @@
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
-  .gallery-header { padding: 80px 20px 40px; }
+  .gallery-header { padding: 100px 20px 40px; }
+  /* title fits mobile viewport */
+  .gallery-title { font-size: clamp(44px, 11vw, 64px); }
   .gallery-lede { font-size: 15px; }
+  /* social rail overlaps content on mobile — hide it; links are in the nav */
+  .gallery-page .social-rail { display: none; }
   .section-rail { margin: 0 16px 40px; padding: 10px 12px; top: 76px; overflow-x: auto; justify-content: flex-start; flex-wrap: nowrap; border-radius: 12px; }
   .section-rail a { padding: 6px 10px; font-size: 10px; letter-spacing: .14em; white-space: nowrap; }
   .g-section { padding: 40px 20px 80px; }
   .g-section-head { grid-template-columns: 1fr; gap: 8px; margin-bottom: 32px; }
   .g-num { font-size: 36px; }
-  .g-grid { grid-template-columns: repeat(6, 1fr); grid-auto-rows: 80px; gap: 10px; }
+  .g-grid { grid-template-columns: repeat(6, 1fr); grid-auto-rows: 100px; gap: 10px; }
   .g-card.r1 { grid-column: span 6; grid-row: span 3; }
   .g-card.r2 { grid-column: span 3; grid-row: span 2; }
   .g-card.r3 { grid-column: span 3; grid-row: span 3; }
   .g-card.r4 { grid-column: span 6; grid-row: span 2; }
   .g-card.r5 { grid-column: span 6; grid-row: span 2; }
+  /* override inline spans for Oração (full-width pair) */
+  #prayer .g-card { grid-column: span 6 !important; grid-row: span 3 !important; }
+  /* override inline span for Jovens tall card */
+  #jovens .g-card:last-child { grid-column: span 6 !important; grid-row: span 4 !important; }
   .g-footer-cta { padding: 60px 20px 80px; }
 }

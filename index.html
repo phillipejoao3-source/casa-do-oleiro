@@ -387,6 +387,7 @@ function fireThemeToggle() {
   const next = document.body.classList.contains('theme-dark') ? 'light' : 'dark';
   window.TWEAKS.theme = next;
   applyTweaks(window.TWEAKS);
+  localStorage.setItem('co-theme', next);
   window.parent?.postMessage({ type: '__edit_mode_set_keys', edits: { theme: next } }, '*');
 }
 document.getElementById('theme-toggle').addEventListener('click', fireThemeToggle);
