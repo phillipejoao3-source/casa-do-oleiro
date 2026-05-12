@@ -250,6 +250,22 @@ section { position: relative; }
 .hero-addr-sm { display: none; }
 .hero-visit-cta { display: none; }
 .theme-toggle--hero { display: none; }
+
+/* CTA pair below hero headline — both shown in hero on all screen sizes */
+.hero-cta-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+.hero-cta-row .hero-visit-cta { display: inline-flex; }
+.hero-prayer-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 999px;
+  border: 1.5px solid rgba(255,255,255,.5);
+  background: transparent; color: var(--fg);
+  text-decoration: none; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  transition: background .2s, border-color .2s, transform .2s; cursor: none;
+}
+.hero-prayer-cta:hover { background: rgba(255,255,255,.09); transform: translateY(-1px); }
+.hero-prayer-cta:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+.theme-light .hero-prayer-cta { border-color: rgba(0,0,0,.28); }
+.theme-light .hero-prayer-cta:hover { background: rgba(0,0,0,.05); }
 .hamburger { display: none; }
 .scroll-hint .line { width: 40px; height: 1px; background: currentColor; animation: scrollLine 2s var(--ease-in-out) infinite; }
 @keyframes scrollLine { 0%,100% { transform: scaleX(.3); transform-origin: left; } 50% { transform: scaleX(1); transform-origin: left; } }
@@ -601,11 +617,10 @@ body.motion-off .gallery-strip { animation-play-state: paused; }
   }
   .hero-addr-sm:hover { color: var(--orange-500); border-color: var(--orange-500); }
 
-  /* Visit CTA — shown in hero on mobile */
-  .hero-visit-cta {
-    display: inline-flex; margin-top: 20px; align-self: start;
-    padding: 12px 22px; font-size: 11px; letter-spacing: .14em;
-  }
+  /* CTA row — stack vertically on mobile */
+  .hero-cta-row { margin-top: 24px; flex-direction: column; align-items: flex-start; gap: 10px; }
+  .hero-visit-cta { display: inline-flex; padding: 12px 22px; font-size: 11px; letter-spacing: .14em; }
+  .hero-prayer-cta { padding: 12px 22px; font-size: 11px; letter-spacing: .14em; }
 
   .scroll-hint { left: 20px; bottom: 20px; }
 
