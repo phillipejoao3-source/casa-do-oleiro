@@ -86,7 +86,7 @@
   background: var(--card-bg);
 }
 .g-card.in-view { opacity: 1; transform: none; }
-.g-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); }
+.g-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .g-card .ph { position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 18px; }
 .g-card .ph::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.65), transparent 55%); pointer-events: none; }
 .g-card .ph .lbl { position: relative; color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
